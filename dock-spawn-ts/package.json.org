@@ -1,0 +1,29 @@
+{
+  "name": "dock-spawn-ts",
+  "version": "2.403.0",
+  "description": "DockSpawn Typescript Version",
+  "license": "MIT",
+  "author": "jochen.kuehner@gmx.de",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "start": "http-server"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.8",
+    "@babel/core": "^7.16.12",
+    "@babel/preset-env": "^7.16.11",
+    "@types/node": "^17.0.10",
+    "http-server": "^14.1.0",
+    "typescript": "^4.5.5",
+    "uglify-js": "^3.14.5",
+    "webpack": "^5.67.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "main": "/lib/js/Exports.js",
+  "files": [
+    "lib/**/*",
+    "src/**/*"
+  ],
+  "homepage": "https://github.com/node-projects/dock-spawn-ts"
+}
