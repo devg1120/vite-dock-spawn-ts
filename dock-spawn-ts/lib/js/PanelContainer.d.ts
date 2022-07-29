@@ -37,20 +37,26 @@ export declare class PanelContainer implements IDockContainerWithSize {
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
+    elementButtonExpand: HTMLDivElement;
     closeButtonClickedHandler: EventHandler;
     closeButtonTouchedHandler: EventHandler;
+    expandButtonClickedHandler: EventHandler;
+    expandButtonTouchedHandler: EventHandler;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     panelType: PanelType;
     tabPage?: TabPage;
+    backupState: string;
+    node: any;
     lastDialogSize?: ISize;
     _floatingDialog?: Dialog;
     _canUndock: boolean;
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
+    _hideExpandButton: boolean;
     _grayOut: HTMLDivElement;
-    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean);
+    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean, hideExpandButton?: boolean);
     canUndock(state: boolean): void;
     addListener(listener: any): void;
     removeListener(listener: any): void;
@@ -65,6 +71,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     _initialize(): void;
     onMouseDown(): void;
     hideCloseButton(state: boolean): void;
+    hideExpandButton(state: boolean): void;
     destroy(): void;
     /**
      * Undocks the panel and and converts it to a dialog box
@@ -90,9 +97,11 @@ export declare class PanelContainer implements IDockContainerWithSize {
     setTitleIcon(icon: string): void;
     setHasChanges(changes: boolean): void;
     setCloseIconTemplate(closeIconTemplate: string): void;
+    setExpandIconTemplate(expandIconTemplate: string): void;
     _updateTitle(): void;
     getRawTitle(): string;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
     onCloseButtonClicked(e: Event): void;
+    onExpandButtonClicked(e: Event): void;
     close(): Promise<void>;
 }

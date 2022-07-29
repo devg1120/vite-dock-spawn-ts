@@ -19,6 +19,13 @@
 	color:red;
 }
 
+.panel-titlebar-button-expand {
+	color:#aaa;
+}
+
+.panel-titlebar-button-expand:hover {
+	color:red;
+}
 .panel-content {
 	background-color: #FFF;
     overflow: auto;

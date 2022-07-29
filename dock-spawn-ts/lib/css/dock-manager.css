@@ -1,4 +1,9 @@
 /************* Panel with title bar ************/
+
+.fullPanel {
+	width: 100%;
+	height: auto;
+}
 .panel-base {}
 
 .panel-base:focus {
@@ -18,7 +23,8 @@
 
 .panel-titlebar-text {
 	float: left;
-	padding-left: 10px;
+	/*padding-left: 10px;*/
+	padding-left: 30px;
 	padding-top: 5px;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -45,7 +51,7 @@
 	float: right;
 	cursor: pointer;
 	padding-right: 8px;
-	content: 'x';
+	content: 'X';
 	font-weight: normal;
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
 	display: flex;
@@ -57,6 +63,33 @@
 	color: black;
 }
 
+.panel-titlebar-button-expand {
+	display: flex;
+    justify-content: flex-end;
+    align-items: center;
+	width: 25px;
+    height: 25px;
+    position: absolute;
+    /*right: 30px;*/
+    left: 0;
+    top: 0;
+}
+
+.panel-titlebar-button-expand::after {
+	float: right;
+	cursor: pointer;
+	padding-right: 8px;
+	content: '#';
+	font-weight: normal;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
+.panel-titlebar-button-expand:hover {
+	color: red;
+}
 .panel-content {
 	width: 100%;
 	overflow: hidden;
@@ -336,7 +369,7 @@
 	float: right;
 	position: absolute;
 	right: 0;
-	content: 'x';
+	content: '■';
 	font-weight: normal;
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
 	cursor: pointer;

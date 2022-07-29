@@ -38,12 +38,17 @@ export class PanelContainer implements IDockContainerWithSize {
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
+    elementButtonExpand: HTMLDivElement;//GS
     closeButtonClickedHandler: EventHandler;
     closeButtonTouchedHandler: EventHandler;
+    expandButtonClickedHandler: EventHandler;//GS
+    expandButtonTouchedHandler: EventHandler;//GS
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     panelType: PanelType;
     tabPage?: TabPage;
+    backupState: string;
+    node: any;
 
     lastDialogSize?: ISize;
 
@@ -52,9 +57,11 @@ export class PanelContainer implements IDockContainerWithSize {
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
+    _hideExpandButton: boolean;//GS
     _grayOut: HTMLDivElement;
 
-    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
+    //constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
+    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean, hideExpandButton?: boolean) {
         if (!title)
             title = 'Panel';
         if (!panelType)
@@ -72,6 +79,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this._canUndock = dockManager._undockEnabled;
         this.eventListeners = [];
         this._hideCloseButton = hideCloseButton;
+        this._hideExpandButton = hideExpandButton;
         this._initialize();
     }
 
@@ -119,6 +127,7 @@ export class PanelContainer implements IDockContainerWithSize {
         state.height = this.height;
         state.canUndock = this._canUndock;
         state.hideCloseButton = this._hideCloseButton;
+        state.hideExpandButton = this._hideExpandButton;//GS
         state.panelType = this.panelType;
     }
 
@@ -142,6 +151,7 @@ export class PanelContainer implements IDockContainerWithSize {
         if (!show && this._grayOut) {
             this.elementContentWrapper.removeChild(this._grayOut);
             this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
+            this.elementButtonExpand.style.display = this._hideExpandButton ? 'none' : 'block';//GS
             this._grayOut = null;
             if (!this._hideCloseButton)
                 this.eventListeners.forEach((listener) => {
@@ -149,16 +159,27 @@ export class PanelContainer implements IDockContainerWithSize {
                         listener.onHideCloseButton({ self: this, state: this._hideCloseButton });
                     }
                 });
+            if (!this._hideExpandButton)//GS
+                this.eventListeners.forEach((listener) => {
+                    if (listener.onHideExpandButton) {
+                        listener.onHideExpandButton({ self: this, state: this._hideExpandButton });
+                    }
+                });
         }
         else if (show && !this._grayOut) {
             this._grayOut = document.createElement('div');
             this._grayOut.className = 'panel-grayout';
             this.elementButtonClose.style.display = 'none';
+            this.elementButtonExpand.style.display = 'none';//GS
             this.elementContentWrapper.appendChild(this._grayOut);
             this.eventListeners.forEach((listener) => {
                 if (listener.onHideCloseButton) {
                     listener.onHideCloseButton({ self: this, state: true });
                 }
+                if (listener.onHideExpandButton) {
+                    listener.onHideExpandButton({ self: this, state: true });
+                }
+
             });
         }
     }
@@ -171,12 +192,16 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementTitleText = document.createElement('div');
         this.elementContentHost = document.createElement('div');
         this.elementButtonClose = document.createElement('div');
+        this.elementButtonExpand = document.createElement('div');//GS
 
         this.elementPanel.appendChild(this.elementTitle);
         this.elementTitle.appendChild(this.elementTitleText);
         this.elementTitle.appendChild(this.elementButtonClose);
+        this.elementTitle.appendChild(this.elementButtonExpand);//GS
         this.elementButtonClose.classList.add('panel-titlebar-button-close');
         this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
+        this.elementButtonExpand.classList.add('panel-titlebar-button-expand');//GS
+        this.elementButtonExpand.style.display = this._hideExpandButton ? 'none' : 'block';//GS
 
         this.elementPanel.appendChild(this.elementContentHost);
 
@@ -197,6 +222,12 @@ export class PanelContainer implements IDockContainerWithSize {
                 new EventHandler(this.elementButtonClose, 'mousedown', this.onCloseButtonClicked.bind(this));
             this.closeButtonTouchedHandler =
                 new EventHandler(this.elementButtonClose, 'touchstart', this.onCloseButtonClicked.bind(this));
+        }
+        if (!this._hideExpandButton) {
+            this.expandButtonClickedHandler =
+                new EventHandler(this.elementButtonExpand, 'mousedown', this.onExpandButtonClicked.bind(this));
+            this.expandButtonTouchedHandler =
+                new EventHandler(this.elementButtonExpand, 'touchstart', this.onExpandButtonClicked.bind(this));
         }
 
         this.elementContentWrapper = document.createElement("div");
@@ -235,6 +266,16 @@ export class PanelContainer implements IDockContainerWithSize {
             }
         });
     }
+    hideExpandButton(state: boolean) {//GS
+        this._hideExpandButton = state;
+        this.elementButtonExpand.style.display = state ? 'none' : 'block';
+        this.eventListeners.forEach((listener) => {
+            if (listener.onHideExpandButton) {
+                listener.onHideExpandButton({ self: this, state: state });
+            }
+        });
+    }
+
 
     destroy() {
         if (this.mouseDownHandler) {
@@ -372,6 +413,9 @@ export class PanelContainer implements IDockContainerWithSize {
     setCloseIconTemplate(closeIconTemplate: string) {
         this.elementButtonClose.innerHTML = closeIconTemplate;
     }
+    setExpandIconTemplate(expandIconTemplate: string) {//GS
+        this.elementButtonExpand.innerHTML = expandIconTemplate;
+    }
 
     _updateTitle() {
         if (this.icon !== null) {
@@ -392,6 +436,65 @@ export class PanelContainer implements IDockContainerWithSize {
         e.preventDefault();
         e.stopPropagation();
         this.close();
+    }
+    onExpandButtonClicked(e: Event) {//GS
+        e.preventDefault();
+        e.stopPropagation();
+
+	// full screen
+        const doc = window.document;
+	if (this.isDialog) {
+	   if (!doc.fullscreen) {
+
+	     this.elementPanel.requestFullscreen();
+
+	     // panel-content
+	     this.elementContentHost.style.width = '100%';
+	     this.elementContentHost.style.height = '100%';
+
+	     // user content
+	     this.elementContent.style.width = '100%';
+	     this.elementContent.style.height = '100%';
+	     this.elementContent.style.backgroundColor="blue";
+
+
+
+	   } else {
+
+	     doc.exitFullscreen();
+             //this.dockManager.dockRight(this.node, this, 50);
+	   }
+        } // end Dialog
+	else {
+
+	   if (!doc.fullscreen) {
+             this.backupState = this.dockManager.saveState();
+	     //console.log(this.backupState);
+	     this.node =  this.dockManager.findNodeFromContainerElement(this.elementPanel);
+	     console.log(typeof  this.node);
+
+             //this.dockManager.openInDialog(this, e, new Point(0,0));
+             this.performUndockToDialog(e, new Point(0,0));
+	     this.elementPanel.requestFullscreen();
+	     // panel-content
+	     this.elementContentHost.style.width = '100%';
+	     this.elementContentHost.style.height = '100%';
+	     this.elementTitle.style.width = '100%';
+
+	     // user content
+	     this.elementContent.style.width = '100%';
+	     this.elementContent.style.height = '100%';
+	     this.elementContent.style.backgroundColor="blue";
+	     //this.elementPanel.requestFullscreen();
+	   } else {
+
+	     doc.exitFullscreen();
+	     this.isDialog = false;
+             this.dockManager.loadState(this.backupState);
+             this.dockManager.dockRight(this.node, this, 50);
+	   }
+
+	}
     }
 
     async close() {
