@@ -239,6 +239,10 @@ export class DockManager {
     }
 
 
+    getRootNode() : DockNode {
+        return this.context.model.rootNode ;
+    }
+
     setRootNode(node: DockNode) {
         // if (this.context.model.rootNode)
         // {

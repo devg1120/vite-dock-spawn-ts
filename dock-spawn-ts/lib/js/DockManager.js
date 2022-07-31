@@ -185,6 +185,9 @@ export class DockManager {
         node.container.resize(container.state.width, container.state.height);
         // node.performLayout();
     }
+    getRootNode() {
+        return this.context.model.rootNode;
+    }
     setRootNode(node) {
         // if (this.context.model.rootNode)
         // {

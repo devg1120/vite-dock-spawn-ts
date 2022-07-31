@@ -54,6 +54,7 @@ export declare class DockManager {
      */
     setModel(model: DockModel): void;
     loadResize(node: DockNode): void;
+    getRootNode(): DockNode;
     setRootNode(node: DockNode): void;
     _onDialogDragStarted(sender: Dialog, e: any): void;
     _onDialogDragEnded(sender: Dialog, e: any): void;

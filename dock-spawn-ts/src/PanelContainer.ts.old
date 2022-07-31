@@ -11,15 +11,11 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelType } from "./enums/PanelType.js";
 import { Dialog } from "./Dialog.js";
 import { TabPage } from './TabPage.js';
-import { DockNode } from "./DockNode.js"; //GS
+
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
-
-
 export class PanelContainer implements IDockContainerWithSize {
-
-    static expand_PanelContainer : PanelContainer;
 
     public closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
 
@@ -54,7 +50,6 @@ export class PanelContainer implements IDockContainerWithSize {
     tabPage?: TabPage;
     backupState: string;
     node: any;
-    rootNode: DockNode;
 
     lastDialogSize?: ISize;
 
@@ -475,56 +470,32 @@ export class PanelContainer implements IDockContainerWithSize {
 	else {
 
 	   if (!this.isExpand) {
-	   //if (this != PanelContainer.expand_PanelContainer) {
-	   //if (this != expand_PanelContainer) {
-             console.log("Expand");
-	     //this.rootNode  = this.dockManager.getRootNode();
-	     //this.dockManager.dockFill(this.rootNode, this);
-        //let documentNode = this.dockManager.context.model.documentManagerNode;
-        //this.dockManager.dockFill(documentNode, this);
-	     //
+             this.backupState = this.dockManager.saveState();
+	     //console.log(this.backupState);
+	     this.node =  this.dockManager.findNodeFromContainerElement(this.elementPanel);
+	     console.log(typeof  this.node);
+
+             //this.dockManager.openInDialog(this, e, new Point(0,0));
+             this.performUndockToDialog(e, new Point(0,0));
+	     this.elementPanel.requestFullscreen();
 	     // panel-content
 	     this.elementContentHost.style.width = '100%';
 	     this.elementContentHost.style.height = '100%';
+	     this.elementTitle.style.width = '100%';
 
 	     // user content
 	     this.elementContent.style.width = '100%';
 	     this.elementContent.style.height = '100%';
 	     this.elementContent.style.backgroundColor="blue";
-        this.dockManager.floatDialog( this, 0,0);
-
-	     /*
-	     //PanelContainer.expand_PanelContainer = this;
-	     //expand_PanelContainer = this;
-             this.backupState = this.dockManager.saveState();
-	     ////console.log(this.backupState);
-	     this.node =  this.dockManager.findNodeFromContainerElement(this.elementPanel);
-	     this.rootNode  = this.dockManager.getRootNode();
-
-	     this.dockManager.setRootNode(this.node);
-	     this.dockManager.rebuildLayout(this.node);
-	     ////this.dockManager.loadResize(this.node);
-	     //this.dockManager.invalidate();
-	     this.dockManager.notifyOnDock(this.node);
-
+	     //this.elementPanel.requestFullscreen();
 	     this.isExpand = true;
-             location.reload();
-*/
-	     //let lastState = localStorage.getItem('lastState');
-	     //this.dockManager.loadState(lastState);
-
-	     //this.dockManager.initialize();
-	     //console.log(typeof  this.node);
-
 	   } else {
 
-             console.log("Close Expand");
-	     this.dockManager.loadState(this.backupState);
-	     this.dockManager.setRootNode(this.rootNode);
-	     this.dockManager.notifyOnDock(this.rootNode);
-
+	     doc.exitFullscreen();
+	     this.isDialog = false;
+             this.dockManager.loadState(this.backupState);
+             this.dockManager.dockRight(this.node, this, 50);
 	     this.isExpand = false;
-             //location.reload();
 	   }
 
 	}

@@ -10,10 +10,12 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelType } from "./enums/PanelType.js";
 import { Dialog } from "./Dialog.js";
 import { TabPage } from './TabPage.js';
+import { DockNode } from "./DockNode.js";
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
 export declare class PanelContainer implements IDockContainerWithSize {
+    static expand_PanelContainer: PanelContainer;
     closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
     onTitleChanged: (panelContainer: PanelContainer, title: string) => void;
     elementPanel: HTMLDivElement;
@@ -34,6 +36,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     hasChanges: boolean;
     minimumAllowedChildNodes: number;
     isDialog: boolean;
+    isExpand: boolean;
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
@@ -48,6 +51,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     tabPage?: TabPage;
     backupState: string;
     node: any;
+    rootNode: DockNode;
     lastDialogSize?: ISize;
     _floatingDialog?: Dialog;
     _canUndock: boolean;

@@ -2,7 +2,6 @@ import { Utils } from "./Utils.js";
 import { UndockInitiator } from "./UndockInitiator.js";
 import { ContainerType } from "./ContainerType.js";
 import { EventHandler } from "./EventHandler.js";
-import { Point } from "./Point.js";
 import { PanelType } from "./enums/PanelType.js";
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -23,6 +22,7 @@ export class PanelContainer {
         this.minimumAllowedChildNodes = 0;
         this._floatingDialog = undefined;
         this.isDialog = false;
+        this.isExpand = false;
         this._canUndock = dockManager._undockEnabled;
         this.eventListeners = [];
         this._hideCloseButton = hideCloseButton;
@@ -351,16 +351,7 @@ export class PanelContainer {
         const doc = window.document;
         if (this.isDialog) {
             if (!doc.fullscreen) {
-                //this.performUndockToDialog(e, new Point(100,100));
-                //this.elementPanel.style.height="100px";
-                //this.elementPanel.style.width="100px";
-                //this.elementPanel.className = '';
-                //this.elementContentHost.className = '';
-                //this.elementContent.className = '';
-                //this.width(500);
                 this.elementPanel.requestFullscreen();
-                //this.elementContentHost.className = 'fullPanel';
-                //this.elementContent.className = 'fullPanel';
                 // panel-content
                 this.elementContentHost.style.width = '100%';
                 this.elementContentHost.style.height = '100%';
@@ -368,39 +359,59 @@ export class PanelContainer {
                 this.elementContent.style.width = '100%';
                 this.elementContent.style.height = '100%';
                 this.elementContent.style.backgroundColor = "blue";
-                //this.elementPanel.requestFullscreen();
-                //this.resize(window.screen.width, window.screen.height);
-                //this.resize(this.width, this.height);
             }
             else {
                 doc.exitFullscreen();
-                this.dockManager.dockRight(this.node, this, 50);
+                //this.dockManager.dockRight(this.node, this, 50);
             }
         } // end Dialog
         else {
-            if (!doc.fullscreen) {
-                this.backupState = this.dockManager.saveState();
-                //console.log(this.backupState);
-                this.node = this.dockManager.findNodeFromContainerElement(this.elementPanel);
-                console.log(typeof this.node);
-                //this.dockManager.openInDialog(this, e, new Point(0,0));
-                this.performUndockToDialog(e, new Point(0, 0));
-                this.elementPanel.requestFullscreen();
+            if (!this.isExpand) {
+                //if (this != PanelContainer.expand_PanelContainer) {
+                //if (this != expand_PanelContainer) {
+                console.log("Expand");
+                //this.rootNode  = this.dockManager.getRootNode();
+                //this.dockManager.dockFill(this.rootNode, this);
+                //let documentNode = this.dockManager.context.model.documentManagerNode;
+                //this.dockManager.dockFill(documentNode, this);
+                //
                 // panel-content
                 this.elementContentHost.style.width = '100%';
                 this.elementContentHost.style.height = '100%';
-                this.elementTitle.style.width = '100%';
                 // user content
                 this.elementContent.style.width = '100%';
                 this.elementContent.style.height = '100%';
                 this.elementContent.style.backgroundColor = "blue";
-                //this.elementPanel.requestFullscreen();
+                this.dockManager.floatDialog(this, 0, 0);
+                /*
+                //PanelContainer.expand_PanelContainer = this;
+                //expand_PanelContainer = this;
+                    this.backupState = this.dockManager.saveState();
+                ////console.log(this.backupState);
+                this.node =  this.dockManager.findNodeFromContainerElement(this.elementPanel);
+                this.rootNode  = this.dockManager.getRootNode();
+       
+                this.dockManager.setRootNode(this.node);
+                this.dockManager.rebuildLayout(this.node);
+                ////this.dockManager.loadResize(this.node);
+                //this.dockManager.invalidate();
+                this.dockManager.notifyOnDock(this.node);
+       
+                this.isExpand = true;
+                    location.reload();
+       */
+                //let lastState = localStorage.getItem('lastState');
+                //this.dockManager.loadState(lastState);
+                //this.dockManager.initialize();
+                //console.log(typeof  this.node);
             }
             else {
-                doc.exitFullscreen();
-                this.isDialog = false;
+                console.log("Close Expand");
                 this.dockManager.loadState(this.backupState);
-                this.dockManager.dockRight(this.node, this, 50);
+                this.dockManager.setRootNode(this.rootNode);
+                this.dockManager.notifyOnDock(this.rootNode);
+                this.isExpand = false;
+                //location.reload();
             }
         }
     }
